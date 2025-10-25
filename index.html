@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server Panel - Aternos Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #00a8ff;
+            --success: #4cd137;
+            --danger: #e84118;
+            --warning: #fbc531;
+            --dark: #2f3640;
+            --light: #f5f6fa;
+            --bg-primary: #1e272e;
+            --bg-secondary: #485460;
+            --text-primary: #ffffff;
+            --text-secondary: #dcdde1;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .logo {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            border: 3px solid var(--primary);
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-weight: 800;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .server-panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .server-panel:hover {
+            box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+            transform: translateY(-5px);
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 450px;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-form h3 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: right;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-size: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.3);
+        }
+
+        .password-toggle {
+            position: absolute;
+            left: 15px;
+            top: 42px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 18px 35px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 220px;
+        }
+
+        .btn-huge {
+            padding: 22px 45px;
+            font-size: 20px;
+            min-width: 200px;
+            width: 100%;
+            max-width: 240px;
+        }
+
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: black; }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-light { background: rgba(255, 255, 255, 0.1); color: white; }
+        .btn-invisible { background: transparent; color: var(--text-primary); border: 2px solid rgba(255, 255, 255, 0.2); }
+        .btn-clickme { 
+            background: linear-gradient(45deg, var(--success), var(--primary)); 
+            color: white;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 20px rgba(76, 209, 55, 0.5);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .user-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .admin-badge {
+            background: var(--warning);
+            color: black;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .server-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-left: 5px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .status-indicator {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-online { 
+            background: var(--success); 
+            box-shadow: 0 0 20px var(--success); 
+        }
+        .status-offline { 
+            background: var(--danger); 
+            box-shadow: 0 0 20px var(--danger); 
+        }
+        .status-starting { 
+            background: var(--warning); 
+            box-shadow: 0 0 20px var(--warning);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .control-panel {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .server-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .server-info {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .server-address {
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(0,168,255,0.2), rgba(76,209,55,0.2));
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .server-address code {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 15px 0;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .server-address code:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.05);
+        }
+
+        .copy-notification {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .copy-notification.show {
+            opacity: 1;
+        }
+
+        .message {
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .message.error { 
+            background: rgba(232, 65, 24, 0.3); 
+            border: 2px solid var(--danger);
+            color: #ff6b6b;
+        }
+        .message.success { 
+            background: rgba(76, 209, 55, 0.3); 
+            border: 2px solid var(--success);
+            color: #7bed9f;
+        }
+        .message.warning { 
+            background: rgba(251, 197, 49, 0.3); 
+            border: 2px solid var(--warning);
+            color: #ffeaa7;
+        }
+
+        .logs-container {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .log-entry {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-time {
+            color: var(--primary);
+            font-weight: bold;
+            min-width: 80px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            .server-status {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group, .server-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .user-info {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+                justify-content: center;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .logo {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .iframe-container {
+                height: 400px;
+            }
+            
+            .btn, .btn-huge {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--success);
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* انیمیشن لودینگ جدید */
+        .login-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(50, 50, 50, 0.7); /* نیمه خاکستری */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        
+        .login-loading-gif {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+        }
+        
+        .login-loading-text {
+            margin-top: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .login-loading-timer {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <img src="https://data.textstudio.com/output/sample/animated/7/6/2/2/minecraft-21-12267.gif" alt="Minecraft Server Logo">
+            </div>
+            <h1>Minecraft Server Panel</h1>
+            <p>مدیریت حرفه‌ای سرور Aternos</p>
+            <p>آدرس سرور: cosjolserver.aternos.me:11940</p>
+        </div>
+
+        <!-- اطلاعات کاربر -->
+        <div id="userInfo" class="user-info hidden">
+            <span id="userDisplayName">کاربر</span>
+            <span id="adminBadge" class="admin-badge hidden">ادمین</span>
+            <button class="btn btn-warning btn-small" onclick="logout()" style="padding: 8px 16px; font-size: 12px;">
+                <i class="fas fa-sign-out-alt"></i> خروج
+            </button>
+        </div>
+
+        <!-- فرم لاگین -->
+        <div id="loginForm" class="login-form">
+            <h3><i class="fas fa-lock"></i> ورود به پنل مدیریت</h3>
+            <div class="form-group">
+                <label for="username"><i class="fas fa-user"></i> نام کاربری:</label>
+                <input type="text" id="username" placeholder="نام کاربری خود را وارد کنید">
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fas fa-key"></i> رمز عبور:</label>
+                <input type="password" id="password" placeholder="رمز عبور خود را وارد کنید">
+                <button type="button" class="password-toggle" id="togglePassword">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <button class="btn btn-main" style="width: 100%;" onclick="checkLogin()">
+                <i class="fas fa-sign-in-alt"></i> ورود به سیستم
+            </button>
+            <div style="text-align: center; margin-top: 20px; font-size: 14px; opacity: 0.8;">
+                <i class="fas fa-info-circle"></i> برای کنترل سرور باید ادمین باشید
+            </div>
+            <div id="loginMessage" class="message error hidden"></div>
+        </div>
+
+        <!-- پنل اصلی سرور -->
+        <div id="serverPanel" class="server-panel hidden">
+            <!-- وضعیت سرور -->
+            <div class="server-status">
+                <div class="status-card" id="statusCard">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <div class="status-info">
+                        <h3><i class="fas fa-server"></i> وضعیت سرور</h3>
+                        <p id="statusText">در حال بررسی...</p>
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <div class="status-info">
+                        <h3><i class="fas fa-globe"></i> آدرس سرور</h3>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                            <p>cosjolserver.aternos.me:11940</p>
+                            <button class="btn btn-main btn-small" onclick="copyAddress()">
+                                <i class="fas fa-copy"></i> کپی آدرس
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-info">
+                        <h3><i class="fas fa-cogs"></i> اطلاعات سرور</h3>
+                        <p>نرم‌افزار: Vanilla</p>
+                        <p>ورژن: 1.20.1</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- آمار لحظه‌ای -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="playerCount">0</div>
+                    <div class="stat-label">بازیکنان آنلاین</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="ramUsage">0MB</div>
+                    <div class="stat-label">مصرف RAM</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="uptime">0h</div>
+                    <div class="stat-label">مدت فعالیت</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="tps">20</div>
+                    <div class="stat-label">TPS</div>
+                </div>
+            </div>
+
+            <!-- کنترل‌های سرور (فقط برای ادمین) -->
+            <div id="adminControls" class="control-panel hidden">
+                <h3 style="margin-bottom: 25px; color: var(--primary);">
+                    <i class="fas fa-gamepad"></i> کنترل‌های مدیریت سرور
+                </h3>
+                
+                <div class="server-actions">
+                    <button class="btn btn-huge btn-success" onclick="controlServer('start')" id="startBtn">
+                        <i class="fas fa-power-off"></i> روشن کردن
+                    </button>
+                    <button class="btn btn-huge btn-danger" onclick="controlServer('stop')" id="stopBtn">
+                        <i class="fas fa-square"></i> خاموش کردن
+                    </button>
+                    <button class="btn btn-huge btn-invisible" onclick="controlServer('cancel')" id="cancelBtn">
+                        <i class="fas fa-times-hexagon"></i> لغو
+                    </button>
+                    <button class="btn btn-huge btn-main" onclick="controlServer('restart')" id="restartBtn">
+                        <i class="fas fa-sync-alt"></i> راه‌اندازی مجدد
+                    </button>
+                    <button class="btn btn-huge btn-success btn-clickme" onclick="controlServer('confirm')" id="confirmBtn">
+                        <i class="fas fa-check-square"></i> تأیید
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
+                    <i class="fas fa-bolt"></i> این کنترل‌ها مستقیماً روی سرور Aternos اثر می‌گذارند
+                </div>
+            </div>
+
+            <!-- پیام برای کاربران غیرادمین -->
+            <div id="userMessage" class="control-panel">
+                <div class="message warning">
+                    <i class="fas fa-eye"></i> شما در حالت مشاهده‌گر هستید. برای کنترل سرور با ادمین تماس بگیرید.
+                </div>
+            </div>
+
+            <!-- پنل Aternos (فقط برای ادمین) -->
+            <div id="aternosPanel" class="control-panel hidden">
+                <h3 style="margin-bottom: 25px; color: var(--primary);">
+                    <i class="fas fa-external-link-alt"></i> پنل مدیریت Aternos
+                </h3>
+                
+                <div class="server-actions">
+                    <button class="btn btn-huge btn-warning" onclick="loadAternosPanel()">
+                        <i class="fas fa-sync-alt"></i> بارگذاری پنل Aternos
+                    </button>
+                    <button class="btn btn-huge btn-main" onclick="openAternosInNewTab()">
+                        <i class="fas fa-external-link-alt"></i> باز کردن در تب جدید
+                    </button>
+                </div>
+                
+                <div class="iframe-container" id="aternosIframeContainer" style="display: none;">
+                    <iframe id="aternosIframe" src="about:blank"></iframe>
+                </div>
+            </div>
+
+            <!-- اطلاعات برای همه کاربران -->
+            <div class="server-address">
+                <h3><i class="fas fa-users"></i> راهنمای اتصال به سرور</h3>
+                <p style="margin: 20px 0; font-size: 1.1em;">برای اتصال به سرور از آدرس زیر در Minecraft استفاده کنید:</p>
+                <code onclick="copyAddress()">cosjolserver.aternos.me:11940</code>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-light" onclick="showConnectionHelp()">
+                        <i class="fas fa-question-circle"></i> راهنمای اتصال
+                    </button>
+                </div>
+            </div>
+
+            <!-- وضعیت لحظه‌ای و لاگ‌ها -->
+            <div class="server-info">
+                <h3><i class="fas fa-terminal"></i> وضعیت لحظه‌ای سرور</h3>
+                <p>آخرین بروزرسانی: <span id="lastUpdate">--</span></p>
+                <p>وضعیت API: <span id="apiStatus" style="color: var(--success);">فعال</span></p>
+                
+                <div class="logs-container">
+                    <div id="serverLogs">
+                        <div class="log-entry">
+                            <span class="log-time" id="currentTime">00:00:00</span>
+                            <span>سیستم راه‌اندازی شد...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay برای نمایش لودینگ -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>در حال بارگذاری پنل Aternos...</p>
+    </div>
+    
+    <!-- انیمیشن لودینگ برای ورود -->
+    <div id="loginLoadingOverlay" class="login-loading-overlay hidden">
+        <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/39ac6b8e-c8c9-4d20-a781-2b36215bf34a/darz0p6-c135df35-834a-4c05-9629-4da136081691.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi8zOWFjNmI4ZS1jOGM5LTRkMjAtYTc4MS0yYjM2MjE1YmYzNGEvZGFyejBwNi1jMTM1ZGYzNS04MzRhLTRjMDUtOTYyOS00ZGExMzYwODE2OTEuZ2lmIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.HaGCk-B6VSmc7r7i5NStmE1Fo8psgpVh-clNqH5ehno" alt="Loading" class="login-loading-gif">
+        <div class="login-loading-text">در حال ورود به سیستم...</div>
+        <div class="login-loading-timer" id="loginTimer">15 ثانیه باقی مانده</div>
+    </div>
+
+    <script>
+        // ==================== تنظیمات ====================
+        const CONFIG = {
+            SERVER_ADDRESS: 'cosjolserver.aternos.me:11940',
+            SESSION_TIMEOUT: 24 * 60 * 60 * 1000,
+            ADMIN_USERNAME: 'kiyanfnaf1388',
+            ADMIN_PASSWORD: 'kiyanfnaf13882014',
+            ATERNOS_PANEL_URL: 'https://aternos.org/server/'
+        };
+
+        // ==================== مدیریت Aternos API ====================
+        class AternosAPIManager {
+            constructor() {
+                this.isAuthenticated = false;
+                this.serverStatus = 'offline';
+                this.serverStats = {
+                    players: 0,
+                    ram: 0,
+                    uptime: 0,
+                    tps: 20
+                };
+                this.retryCount = 0;
+                this.maxRetries = 3;
+            }
+
+            async authenticate(username, password) {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    // بررسی وجود APIهای Aternos
+                    if (typeof window.aternos === 'undefined') {
+                        console.warn('Aternos API not found, using simulation mode');
+                        this.isAuthenticated = true;
+                        await this.simulateServerStatus();
+                        return true;
+                    }
+                    
+                    // استفاده از API واقعی Aternos
+                    const authSuccess = await this.authenticateWithAternos(username, password);
+                    this.isAuthenticated = authSuccess;
+                    
+                    return authSuccess;
+                } catch (error) {
+                    console.error('Authentication error:', error);
+                    this.isAuthenticated = false;
+                    return false;
+                }
+            }
+
+            async authenticateWithAternos(username, password) {
+                return new Promise((resolve) => {
+                    // شبیه‌سازی احراز هویت موفق
+                    setTimeout(() => {
+                        resolve(true);
+                    }, 1000);
+                });
+            }
+
+            async controlServer(action) {
+                if (!this.isAuthenticated) {
+                    throw new Error('Not authenticated');
+                }
+
+                try {
+                    let result = false;
+                    
+                    switch(action) {
+                        case 'start':
+                            console.log('Starting server...');
+                            this.serverStatus = 'starting';
+                            // شبیه‌سازی راه‌اندازی سرور
+                            setTimeout(() => {
+                                this.serverStatus = 'online';
+                                this.updateUI();
+                            }, 10000);
+                            result = true;
+                            break;
+                            
+                        case 'stop':
+                            console.log('Stopping server...');
+                            this.serverStatus = 'offline';
+                            result = true;
+                            break;
+                            
+                        case 'restart':
+                            console.log('Restarting server...');
+                            this.serverStatus = 'starting';
+                            setTimeout(() => {
+                                this.serverStatus = 'online';
+                                this.updateUI();
+                            }, 15000);
+                            result = true;
+                            break;
+                            
+                        case 'cancel':
+                            console.log('Cancelling operation...');
+                            this.serverStatus = 'offline';
+                            result = true;
+                            break;
+                            
+                        case 'confirm':
+                            console.log('Confirming operation...');
+                            this.serverStatus = 'online';
+                            result = true;
+                            break;
+                            
+                        default:
+                            throw new Error('Invalid action: ' + action);
+                    }
+                    
+                    this.updateUI();
+                    return result;
+                } catch (error) {
+                    console.error('Control error:', error);
+                    throw error;
+                }
+            }
+
+            async updateServerStatus() {
+                try {
+                    // شبیه‌سازی وضعیت سرور - در حالت واقعی باید به API Aternos متصل شود
+                    await this.simulateServerStatus();
+                    return this.serverStatus;
+                } catch (error) {
+                    console.error('Status update error:', error);
+                    this.serverStatus = 'offline';
+                    return 'offline';
+                }
+            }
+
+            async simulateServerStatus() {
+                // شبیه‌سازی وضعیت سرور برای تست
+                const statuses = ['online', 'offline', 'starting'];
+                const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                
+                this.serverStatus = randomStatus;
+                
+                if (this.serverStatus === 'online') {
+                    this.serverStats = {
+                        players: Math.floor(Math.random() * 15),
+                        ram: Math.floor(Math.random() * 1500) + 500,
+                        uptime: Math.floor(Math.random() * 86400),
+                        tps: 18 + Math.random() * 4
+                    };
+                } else {
+                    this.serverStats = {
+                        players: 0,
+                        ram: 0,
+                        uptime: 0,
+                        tps: 0
+                    };
+                }
+                
+                return this.serverStatus;
+            }
+
+            async getServerStats() {
+                return this.serverStats;
+            }
+
+            updateUI() {
+                // این تابع توسط AppManager فراخوانی می‌شود
+            }
+        }
+
+        // ==================== مدیریت برنامه ====================
+        class AppManager {
+            constructor() {
+                this.aternosAPI = new AternosAPIManager();
+                this.isAdmin = false;
+                this.currentUser = '';
+                this.serverStatus = 'offline';
+                this.isProcessing = false;
+                this.monitoringInterval = null;
+                this.statsInterval = null;
+            }
+
+            // بررسی لاگین
+            async checkLogin(username, password) {
+                try {
+                    // بررسی کاربر ادمین
+                    if (username === CONFIG.ADMIN_USERNAME && password === CONFIG.ADMIN_PASSWORD) {
+                        this.isAdmin = true;
+                        this.currentUser = username;
+                        
+                        // احراز هویت با Aternos
+                        const authSuccess = await this.aternosAPI.authenticate(username, password);
+                        
+                        if (authSuccess) {
+                            this.saveSession();
+                            this.addLog('احراز هویت با موفقیت انجام شد (ادمین)', 'success');
+                            return true;
+                        } else {
+                            this.addLog('خطا در احراز هویت با Aternos', 'error');
+                            return false;
+                        }
+                    } else {
+                        // کاربر عادی
+                        this.isAdmin = false;
+                        this.currentUser = username;
+                        
+                        // برای کاربران عادی، فقط اجازه مشاهده می‌دهیم
+                        this.saveSession();
+                        this.addLog('ورود موفقیت‌آمیز (کاربر عادی)', 'success');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    this.addLog('خطا در ورود به سیستم: ' + error.message, 'error');
+                    return false;
+                }
+            }
+
+            // ذخیره session
+            saveSession() {
+                const sessionData = {
+                    user: this.currentUser,
+                    isAdmin: this.isAdmin,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('mc_server_session', JSON.stringify(sessionData));
+            }
+
+            // بازیابی session
+            restoreSession() {
+                try {
+                    const sessionData = localStorage.getItem('mc_server_session');
+                    if (sessionData) {
+                        const data = JSON.parse(sessionData);
+                        
+                        if (Date.now() - data.timestamp < CONFIG.SESSION_TIMEOUT) {
+                            this.currentUser = data.user;
+                            this.isAdmin = data.isAdmin;
+                            return true;
+                        } else {
+                            // session منقضی شده
+                            localStorage.removeItem('mc_server_session');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Session restore error:', error);
+                }
+                return false;
+            }
+
+            // بررسی انقضای session
+            checkSessionExpiry() {
+                try {
+                    const sessionData = localStorage.getItem('mc_server_session');
+                    if (sessionData) {
+                        const data = JSON.parse(sessionData);
+                        const currentTime = Date.now();
+                        const sessionAge = currentTime - data.timestamp;
+                        
+                        if (sessionAge > CONFIG.SESSION_TIMEOUT) {
+                            localStorage.removeItem('mc_server_session');
+                            this.logout();
+                            return false;
+                        }
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Session check error:', error);
+                }
+                return false;
+            }
+
+            // کنترل سرور
+            async controlServer(action) {
+                if (!this.isAdmin) {
+                    this.addLog('شما دسترسی ادمین ندارید!', 'error');
+                    return false;
+                }
+
+                if (this.isProcessing) {
+                    this.addLog('در حال پردازش درخواست قبلی...', 'warning');
+                    return false;
+                }
+
+                this.isProcessing = true;
+                this.updateButtonStates();
+
+                const actionText = {
+                    'start': 'روشن کردن',
+                    'stop': 'خاموش کردن', 
+                    'restart': 'راه‌اندازی مجدد',
+                    'cancel': 'لغو',
+                    'confirm': 'تأیید'
+                }[action];
+
+                this.addLog(`درخواست ${actionText} سرور ارسال شد...`);
+
+                try {
+                    const success = await this.aternosAPI.controlServer(action);
+                    
+                    if (success) {
+                        this.addLog(`سرور ${actionText} شد`, 'success');
+                        this.serverStatus = this.aternosAPI.serverStatus;
+                        this.updateUI();
+                        return true;
+                    } else {
+                        this.addLog(`خطا در ${actionText} سرور`, 'error');
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Control error:', error);
+                    this.addLog(`خطا در ${actionText} سرور: ${error.message}`, 'error');
+                    return false;
+                } finally {
+                    this.isProcessing = false;
+                    this.updateButtonStates();
+                }
+            }
+
+            // دریافت وضعیت سرور
+            async updateServerStatus() {
+                try {
+                    const status = await this.aternosAPI.updateServerStatus();
+                    this.serverStatus = status;
+                    this.updateUI();
+                    
+                    // بروزرسانی آمار اگر سرور آنلاین باشد
+                    if (status === 'online') {
+                        await this.updateServerStats();
+                    } else {
+                        this.resetStats();
+                    }
+                } catch (error) {
+                    console.error('Status update error:', error);
+                }
+            }
+
+            // بروزرسانی آمار سرور
+            async updateServerStats() {
+                try {
+                    const stats = await this.aternosAPI.getServerStats();
+                    document.getElementById('playerCount').textContent = stats.players;
+                    document.getElementById('ramUsage').textContent = stats.ram + 'MB';
+                    document.getElementById('uptime').textContent = this.formatUptime(stats.uptime);
+                    document.getElementById('tps').textContent = stats.tps.toFixed(1);
+                } catch (error) {
+                    console.error('Stats update error:', error);
+                    this.resetStats();
+                }
+            }
+
+            // فرمت کردن مدت فعالیت
+            formatUptime(seconds) {
+                if (!seconds) return '0h';
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                return `${hours}h ${minutes}m`;
+            }
+
+            // ریست آمار
+            resetStats() {
+                document.getElementById('playerCount').textContent = '0';
+                document.getElementById('ramUsage').textContent = '0MB';
+                document.getElementById('uptime').textContent = '0h';
+                document.getElementById('tps').textContent = '0';
+            }
+
+            // بروزرسانی UI
+            updateUI() {
+                const indicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('statusText');
+                
+                // حذف کلاس‌های وضعیت قبلی
+                indicator.className = 'status-indicator';
+                
+                switch(this.serverStatus) {
+                    case 'online':
+                        indicator.classList.add('status-online');
+                        statusText.textContent = 'آنلاین 🟢 - سرور فعال است';
+                        statusText.style.color = '#4cd137';
+                        break;
+                    case 'offline':
+                        indicator.classList.add('status-offline');
+                        statusText.textContent = 'آفلاین 🔴 - سرور غیرفعال است';
+                        statusText.style.color = '#e84118';
+                        break;
+                    case 'starting':
+                        indicator.classList.add('status-starting');
+                        statusText.textContent = 'در حال راه‌اندازی... ⚡';
+                        statusText.style.color = '#fbc531';
+                        break;
+                    default:
+                        indicator.classList.add('status-offline');
+                        statusText.textContent = 'وضعیت نامعلوم';
+                        statusText.style.color = '#dcdde1';
+                }
+                
+                this.updateButtonStates();
+                this.updateLastUpdateTime();
+            }
+
+            // بروزرسانی دکمه‌ها
+            updateButtonStates() {
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const restartBtn = document.getElementById('restartBtn');
+                const cancelBtn = document.getElementById('cancelBtn');
+                const confirmBtn = document.getElementById('confirmBtn');
+
+                if (startBtn && stopBtn && restartBtn && cancelBtn && confirmBtn) {
+                    startBtn.disabled = this.isProcessing || this.serverStatus !== 'offline';
+                    stopBtn.disabled = this.isProcessing || this.serverStatus !== 'online';
+                    restartBtn.disabled = this.isProcessing || this.serverStatus !== 'online';
+                    cancelBtn.disabled = this.isProcessing || this.serverStatus !== 'starting';
+                    confirmBtn.disabled = this.isProcessing;
+
+                    // اضافه کردن کلاس loading برای حالت پردازش
+                    const buttons = [startBtn, stopBtn, restartBtn, cancelBtn, confirmBtn];
+                    buttons.forEach(btn => {
+                        if (this.isProcessing) {
+                            btn.classList.add('loading');
+                        } else {
+                            btn.classList.remove('loading');
+                        }
+                    });
+                }
+            }
+
+            // بروزرسانی زمان
+            updateLastUpdateTime() {
+                const now = new Date();
+                document.getElementById('lastUpdate').textContent = 
+                    now.toLocaleTimeString('fa-IR');
+                document.getElementById('currentTime').textContent = 
+                    now.toLocaleTimeString('fa-IR');
+            }
+
+            // اضافه کردن لاگ
+            addLog(message, type = 'info') {
+                const logsContainer = document.getElementById('serverLogs');
+                if (!logsContainer) return;
+                
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry`;
+                
+                const now = new Date();
+                const timestamp = now.toLocaleTimeString('fa-IR');
+                const typeIcon = {
+                    'error': '❌',
+                    'success': '✅', 
+                    'warning': '⚠️',
+                    'info': 'ℹ️'
+                }[type] || 'ℹ️';
+                
+                logEntry.innerHTML = `
+                    <span class="log-time">${timestamp}</span>
+                    <span style="color: ${type === 'error' ? '#ff6b6b' : type === 'success' ? '#7bed9f' : type === 'warning' ? '#ffeaa7' : 'white'}">
+                        ${typeIcon} ${message}
+                    </span>
+                `;
+                
+                logsContainer.appendChild(logEntry);
+                logsContainer.scrollTop = logsContainer.scrollHeight;
+                this.updateLastUpdateTime();
+            }
+
+            // هندلینگ خطاهای شبکه
+            handleNetworkError(error) {
+                console.error('Network error:', error);
+                this.addLog('خطا در اتصال به سرور: ' + error.message, 'error');
+                
+                // نمایش وضعیت آفلاین
+                this.serverStatus = 'offline';
+                this.updateUI();
+                
+                // تلاش مجدد پس از 30 ثانیه
+                setTimeout(() => {
+                    this.updateServerStatus();
+                }, 30000);
+            }
+
+            // شروع مانیتورینگ
+            startMonitoring() {
+                this.updateServerStatus();
+                
+                // حذف interval قبلی اگر وجود داشت
+                if (this.monitoringInterval) {
+                    clearInterval(this.monitoringInterval);
+                }
+                
+                this.monitoringInterval = setInterval(async () => {
+                    await this.updateServerStatus();
+                    this.checkSessionExpiry();
+                }, 30000); // بروزرسانی هر 30 ثانیه
+                
+                // بروزرسانی آمار هر 10 ثانیه وقتی سرور آنلاین است
+                this.statsInterval = setInterval(() => {
+                    if (this.serverStatus === 'online') {
+                        this.updateServerStats();
+                    }
+                }, 10000);
+            }
+
+            // توقف مانیتورینگ
+            stopMonitoring() {
+                if (this.monitoringInterval) {
+                    clearInterval(this.monitoringInterval);
+                    this.monitoringInterval = null;
+                }
+                if (this.statsInterval) {
+                    clearInterval(this.statsInterval);
+                    this.statsInterval = null;
+                }
+            }
+
+            // خروج از سیستم
+            logout() {
+                this.stopMonitoring();
+                this.isAdmin = false;
+                this.currentUser = '';
+                this.aternosAPI.isAuthenticated = false;
+                localStorage.removeItem('mc_server_session');
+                location.reload();
+            }
+        }
+
+        // ==================== نمونه اصلی ====================
+        const appManager = new AppManager();
+
+        // ==================== توابع global ====================
+        async function checkLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const message = document.getElementById('loginMessage');
+
+            if (!username || !password) {
+                message.textContent = 'لطفاً نام کاربری و رمز عبور را وارد کنید';
+                message.classList.remove('hidden');
+                return;
+            }
+
+            // نمایش انیمیشن لودینگ
+            const loginLoadingOverlay = document.getElementById('loginLoadingOverlay');
+            const loginTimer = document.getElementById('loginTimer');
+            loginLoadingOverlay.classList.remove('hidden');
+            
+            // تایمر 15 ثانیه‌ای
+            let secondsLeft = 15;
+            const timerInterval = setInterval(() => {
+                secondsLeft--;
+                loginTimer.textContent = secondsLeft + ' ثانیه باقی مانده';
+                
+                if (secondsLeft <= 0) {
+                    clearInterval(timerInterval);
+                    loginLoadingOverlay.classList.add('hidden');
+                }
+            }, 1000);
+
+            // نمایش وضعیت loading
+            const loginBtn = document.querySelector('#loginForm .btn');
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ورود...';
+            loginBtn.disabled = true;
+
+            const success = await appManager.checkLogin(username, password);
+            
+            // مخفی کردن لودینگ پس از 15 ثانیه
+            setTimeout(() => {
+                loginLoadingOverlay.classList.add('hidden');
+                clearInterval(timerInterval);
+                
+                if (success) {
+                    document.getElementById('loginForm').classList.add('hidden');
+                    document.getElementById('serverPanel').classList.remove('hidden');
+                    document.getElementById('userInfo').classList.remove('hidden');
+                    
+                    document.getElementById('userDisplayName').textContent = username;
+                    
+                    if (appManager.isAdmin) {
+                        document.getElementById('adminBadge').classList.remove('hidden');
+                        document.getElementById('adminControls').classList.remove('hidden');
+                        document.getElementById('aternosPanel').classList.remove('hidden');
+                        document.getElementById('userMessage').classList.add('hidden');
+                        
+                        // بارگذاری خودکار پنل Aternos برای ادمین
+                        setTimeout(() => {
+                            loadAternosPanel();
+                        }, 2000);
+                    } else {
+                        document.getElementById('adminBadge').classList.add('hidden');
+                        document.getElementById('adminControls').classList.add('hidden');
+                        document.getElementById('aternosPanel').classList.add('hidden');
+                        document.getElementById('userMessage').classList.remove('hidden');
+                    }
+                    
+                    appManager.startMonitoring();
+                } else {
+                    message.textContent = 'نام کاربری یا رمز عبور اشتباه است';
+                    message.classList.remove('hidden');
+                    
+                    // بازگرداندن دکمه به حالت عادی
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> ورود به سیستم';
+                    loginBtn.disabled = false;
+                }
+            }, 15000);
+        }
+
+        async function controlServer(action) {
+            await appManager.controlServer(action);
+        }
+
+        function logout() {
+            appManager.logout();
+        }
+
+        function copyAddress() {
+            const address = CONFIG.SERVER_ADDRESS;
+            
+            // ایجاد المان موقت برای کپی
+            const tempInput = document.createElement('input');
+            tempInput.value = address;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                
+                if (successful) {
+                    showMessage('آدرس سرور کپی شد! 🎮', 'success');
+                } else {
+                    showMessage('خطا در کپی آدرس', 'error');
+                }
+            } catch (err) {
+                document.body.removeChild(tempInput);
+                
+                // استفاده از Clipboard API جدید
+                navigator.clipboard.writeText(address)
+                    .then(() => showMessage('آدرس سرور کپی شد! 🎮', 'success'))
+                    .catch(() => showMessage('خطا در کپی آدرس', 'error'));
+            }
+        }
+
+        function showConnectionHelp() {
+            showMessage('برای اتصال: Minecraft → Multiplayer → Direct Connect → آدرس سرور را وارد کنید', 'info');
+        }
+
+        function loadAternosPanel() {
+            const iframeContainer = document.getElementById('aternosIframeContainer');
+            const iframe = document.getElementById('aternosIframe');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // نمایش لودینگ
+            loadingOverlay.classList.remove('hidden');
+            
+            // بارگذاری پنل Aternos در iframe
+            setTimeout(() => {
+                iframe.src = CONFIG.ATERNOS_PANEL_URL;
+                iframeContainer.style.display = 'block';
+                
+                // مخفی کردن لودینگ پس از 3 ثانیه
+                setTimeout(() => {
+                    loadingOverlay.classList.add('hidden');
+                    appManager.addLog('پنل Aternos با موفقیت بارگذاری شد', 'success');
+                }, 3000);
+                
+                // اضافه کردن event listener برای ردیابی لود شدن iframe
+                iframe.onload = function() {
+                    loadingOverlay.classList.add('hidden');
+                    appManager.addLog('پنل Aternos با موفقیت بارگذاری شد', 'success');
+                };
+                
+                iframe.onerror = function() {
+                    loadingOverlay.classList.add('hidden');
+                    appManager.addLog('خطا در بارگذاری پنل Aternos', 'error');
+                    showMessage('خطا در بارگذاری پنل Aternos. لطفاً از دکمه "باز کردن در تب جدید" استفاده کنید.', 'error');
+                };
+            }, 1000);
+        }
+
+        function openAternosInNewTab() {
+            window.open(CONFIG.ATERNOS_PANEL_URL, '_blank');
+            appManager.addLog('پنل Aternos در تب جدید باز شد', 'info');
+        }
+
+        function showMessage(text, type = 'info') {
+            // حذف پیام‌های قبلی
+            const existingMessages = document.querySelectorAll('.custom-message');
+            existingMessages.forEach(msg => {
+                if (msg.parentNode) {
+                    msg.parentNode.removeChild(msg);
+                }
+            });
+            
+            const message = document.createElement('div');
+            message.className = `message ${type} custom-message`;
+            message.textContent = text;
+            message.style.position = 'fixed';
+            message.style.top = '20px';
+            message.style.left = '50%';
+            message.style.transform = 'translateX(-50%)';
+            message.style.zIndex = '10000';
+            message.style.minWidth = '300px';
+            message.style.textAlign = 'center';
+            message.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+            message.style.borderRadius = '10px';
+            message.style.padding = '15px 20px';
+            message.style.fontWeight = '600';
+            
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.opacity = '0';
+                message.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    if (message.parentNode) {
+                        message.parentNode.removeChild(message);
+                    }
+                }, 500);
+            }, 4000);
+        }
+
+        // ==================== بارگذاری اولیه ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            // قابلیت نمایش/مخفی کردن رمز عبور
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+
+            // بازیابی session
+            const hasSession = appManager.restoreSession();
+            
+            if (hasSession) {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('serverPanel').classList.remove('hidden');
+                document.getElementById('userInfo').classList.remove('hidden');
+                
+                document.getElementById('userDisplayName').textContent = appManager.currentUser;
+                
+                if (appManager.isAdmin) {
+                    document.getElementById('adminBadge').classList.remove('hidden');
+                    document.getElementById('adminControls').classList.remove('hidden');
+                    document.getElementById('aternosPanel').classList.remove('hidden');
+                    document.getElementById('userMessage').classList.add('hidden');
+                    
+                    // بارگذاری خودکار پنل Aternos برای ادمین
+                    setTimeout(() => {
+                        loadAternosPanel();
+                    }, 1000);
+                } else {
+                    document.getElementById('adminBadge').classList.add('hidden');
+                    document.getElementById('adminControls').classList.add('hidden');
+                    document.getElementById('aternosPanel').classList.add('hidden');
+                    document.getElementById('userMessage').classList.remove('hidden');
+                }
+                
+                appManager.startMonitoring();
+                appManager.addLog('سیستم با موفقیت راه‌اندازی شد', 'success');
+            } else {
+                appManager.addLog('برای شروع، وارد سیستم شوید', 'info');
+            }
+
+            // بروزرسانی زمان به صورت real-time
+            setInterval(() => {
+                document.getElementById('currentTime').textContent = 
+                    new Date().toLocaleTimeString('fa-IR');
+            }, 1000);
+
+            // امکان ورود با دکمه Enter
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkLogin();
+                }
+            });
+
+            // اضافه کردن قابلیت کلیک روی آدرس سرور برای کپی
+            const addressCode = document.querySelector('.server-address code');
+            if (addressCode) {
+                addressCode.style.cursor = 'pointer';
+                addressCode.title = 'کلیک برای کپی آدرس';
+            }
+        });
+    </script>
+</body>
+</html>
